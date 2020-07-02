@@ -4,7 +4,7 @@ spring:
   datasource:
     username: root
     password: Lanke@123
-    url: jdbc:mysql://47.100.170.24:3307/gulimall_ums?useUnicode=true&characterEncoding=UTF-8&useSSL=false&serverTimezone=Asia/Shanghai
+    url: jdbc:mysql://gulimall.jdbc.com:3307/gulimall_ums?useUnicode=true&characterEncoding=UTF-8&useSSL=false&serverTimezone=Asia/Shanghai
   cloud:
     nacos:
       discovery:
