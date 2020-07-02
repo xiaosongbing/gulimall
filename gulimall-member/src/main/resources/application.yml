@@ -1,0 +1,17 @@
+spring:
+  application:
+    name: gulimall-member
+  datasource:
+    username: root
+    password: Lanke@123
+    url: jdbc:mysql://47.100.170.24:3307/gulimall_ums?useUnicode=true&characterEncoding=UTF-8&useSSL=false&serverTimezone=Asia/Shanghai
+
+mybatis-plus:
+  mapper-locations: classpath*:/mapper/**/*.xml
+  global-config:
+    db-config:
+      id-type: auto
+      logic-delete-value: 1
+      logic-not-delete-value: 0
+server:
+  port: 8000
