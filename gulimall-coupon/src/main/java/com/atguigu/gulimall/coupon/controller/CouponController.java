@@ -5,11 +5,9 @@ import java.util.Map;
 
 //import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.cloud.context.config.annotation.RefreshScope;
+import org.springframework.web.bind.annotation.*;
 
 import com.atguigu.gulimall.coupon.entity.CouponEntity;
 import com.atguigu.gulimall.coupon.service.CouponService;
@@ -25,13 +23,24 @@ import com.atguigu.common.utils.R;
  * @email zzwang@gmail.com
  * @date 2020-07-02 17:21:24
  */
+@RefreshScope//支持nacos的动态刷新
 @RestController
 @RequestMapping("coupon/coupon")
 public class CouponController {
     @Autowired
     private CouponService couponService;
 
-    @RequestMapping("/member/list")
+    @Value("${coupon.user.name}")
+    private String userName;
+    @Value("${coupon.user.age}")
+    private String userAge;
+
+    @GetMapping("getConfig")
+    public R getConfig() {
+        return R.ok().put("couponUserName", userName).put("couponUserAge", userAge);
+    }
+
+    @GetMapping("/member/list")
     public R memberCoupons() {
         CouponEntity couponEntity = new CouponEntity();
         couponEntity.setCouponName("满100减10");
