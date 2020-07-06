@@ -7,7 +7,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 /**
  * @version 1.0
  * @ClassName: CouponFeginService
- * @Description: TODO
+ * @Description: 优惠券fegin调用服务
  * @Author zzwang<br />
  * @Date: 2020/7/2 17:52
  */
