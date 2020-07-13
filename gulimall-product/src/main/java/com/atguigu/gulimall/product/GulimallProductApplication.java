@@ -50,6 +50,12 @@ import org.springframework.cloud.client.discovery.EnableDiscoveryClient;
  * @ControllerAdvice
  *  1）、编写异常处理类，使用@ControllerAdvice。
  *  2）、使用@ExceptionHandler标注方法可以处理的异常。
+ *
+ * 7.整合redisson作为分布式锁等功能框架
+ *  1）、引入依赖
+ *  2）、配置redisson
+ *
+ *
  */
 @SpringBootApplication
 @MapperScan("com.atguigu.gulimall.product.dao")

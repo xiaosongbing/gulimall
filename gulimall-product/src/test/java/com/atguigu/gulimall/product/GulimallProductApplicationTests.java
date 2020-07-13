@@ -8,6 +8,7 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.additional.query.impl.QueryChainWrapper;
 import org.junit.jupiter.api.Test;
 import org.junit.runner.RunWith;
+import org.redisson.api.RedissonClient;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
@@ -21,6 +22,13 @@ class GulimallProductApplicationTests {
     @Autowired
     private SpuInfoDescService spuInfoDescService;
 
+    @Autowired
+    private RedissonClient redissonClient;
+
+    @Test
+    void testRedissClient() {
+        System.out.println(redissonClient);
+    }
     @Test
     void contextLoads() {
         SpuInfoDescEntity spuInfoDescEntity = new SpuInfoDescEntity();
