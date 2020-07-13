@@ -5,6 +5,8 @@ import com.alibaba.fastjson.TypeReference;
 import com.atguigu.gulimall.product.service.CategoryBrandRelationService;
 import com.atguigu.gulimall.product.vo.Catelog2Vo;
 import org.apache.commons.lang.StringUtils;
+import org.redisson.api.RLock;
+import org.redisson.api.RedissonClient;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.data.redis.core.script.DefaultRedisScript;
@@ -35,6 +37,9 @@ public class CategoryServiceImpl extends ServiceImpl<CategoryDao, CategoryEntity
 
     @Autowired
     private CategoryBrandRelationService categoryBrandRelationService;
+
+    @Autowired
+    private RedissonClient redisson;
 
     @Override
     public PageUtils queryPage(Map<String, Object> params) {
@@ -115,7 +120,7 @@ public class CategoryServiceImpl extends ServiceImpl<CategoryDao, CategoryEntity
         if(StringUtils.isEmpty(catalogJson)) {
             //2.缓存中没有, 查询数据库
             System.out.println("缓存不命中....将要查询数据库....");
-            Map<String, List<Catelog2Vo>> catalogJsonFromDb = getCatalogJsonFromDbWithRedisLock();
+            Map<String, List<Catelog2Vo>> catalogJsonFromDb = getCatalogJsonFromDbWithRedissonLock();
             //3. 查到数据, 将对象转为JSON放在缓存中(这里存在时间误差, 释放锁跟存在redis不在同一个锁操作中)
 //            String jsonString = JSON.toJSONString(catalogJsonFromDb);
 //            redisTemplate.opsForValue().set("catalogJson", jsonString, 1, TimeUnit.DAYS);
@@ -127,9 +132,30 @@ public class CategoryServiceImpl extends ServiceImpl<CategoryDao, CategoryEntity
         return result;
     }
 
+    /**
+     * 缓存里面的数据如何和数据库保持一致
+     * 缓存数据一致性
+     * 1) 双写模式
+     * 2) 失效模式
+     * @return
+     */
+    public Map<String, List<Catelog2Vo>> getCatalogJsonFromDbWithRedissonLock() {
+        // 1.锁的名字。锁的粒度, 越细越快.
+        //锁的粒度: 具体缓存的是某个数据, 11-商品; product-11-lock product-12-lock
+        RLock lock = redisson.getLock("CatalogJson");
+        lock.lock();
+        Map<String, List<Catelog2Vo>> resMap = null;
+        try {
+            resMap = catalogJsonHandler();
+        } finally {
+            lock.unlock();
+        }
+        return resMap;
+
+    }
+
     public Map<String, List<Catelog2Vo>> getCatalogJsonFromDbWithRedisLock() {
         //分布式核心：加锁 跟 解锁 都是原子性
-
         //1.占分布式锁, 去redis占坑 --原子命令setnxex
         String uuid = UUID.randomUUID().toString();
         Boolean lock = redisTemplate.opsForValue().setIfAbsent("lock", uuid, 60, TimeUnit.SECONDS);
@@ -147,7 +173,6 @@ public class CategoryServiceImpl extends ServiceImpl<CategoryDao, CategoryEntity
                 //删除锁-原子
                 Long lock1 = redisTemplate.execute(new DefaultRedisScript<Long>(script, Long.class),
                         Arrays.asList("lock", uuid));
-
                 /*String lockValue = redisTemplate.opsForValue().get("lock");
                 if(uuid.equals(lockValue)) {
                     //删除自己的锁 ---- 若程序执行业务时间过长， redis设置过期时间过期了, 别人抢占占位锁成功后, 避免删除其他线程的锁
@@ -163,6 +188,8 @@ public class CategoryServiceImpl extends ServiceImpl<CategoryDao, CategoryEntity
         }
 
     }
+
+
 
     private Map<String, List<Catelog2Vo>> catalogJsonHandler() {
         String catalogJson = redisTemplate.opsForValue().get("catalogJson");
