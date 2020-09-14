@@ -10,7 +10,7 @@ spring:
 #    alicloud:
 #      oss:
 #        endpoint: oss-cn-shenzhen.aliyuncs.com
-#        bucket: gulimall-zzwang
-#      access-key: LTAI4G2mhfNHPGHZzPvpDsTX
-#      secret-key: md6at7ArJVcPP6Ps6woTtKd1dpqtmD
+#        bucket: gulimall-zzwang-2020-
+#      access-key: LTAI4G2mhfNHP-2020-GHZzPvpDsTX
+#      secret-key: md6at7ArJVcPP6-2020-Ps6woTtKd1dpqtmD
 
